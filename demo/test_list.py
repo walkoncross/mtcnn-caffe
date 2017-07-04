@@ -14,7 +14,7 @@ SHOW_IMAGE = False
 
 def print_usage():
     usage = 'python %s <image-list-file>' % osp.basename(__file__)
-    print usage
+    print "USAGE:", usage
 
 
 print_usage()

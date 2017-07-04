@@ -12,7 +12,7 @@ import os.path as osp
 
 def print_usage():
     usage = 'python %s <image-path>' % osp.basename(__file__)
-    print usage
+    print "USAGE:", usage
 
 
 print_usage()
@@ -50,7 +50,7 @@ def detectFace(img_path, threshold):
         out.append(out_)
 
     image_num = len(scales)
-    
+
     rectangles = []
     for i in range(image_num):
         cls_prob = out[i]['prob1'][0][1]

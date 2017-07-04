@@ -7,7 +7,8 @@ import cv2
 import numpy as np
 
 import json
-
+import os
+import os.path as osp
 
 deploy = '12net.prototxt'
 caffemodel = '12net.caffemodel'
@@ -84,38 +85,54 @@ def detectFace(img_path,threshold):
     return rectangles
 
 threshold = [0.6,0.6,0.7]
-imgpath = r"c:/zyf/test_imgs/ak_256x256.png"
-rectangles = detectFace(imgpath,threshold)
-img = cv2.imread(imgpath)
-draw = img.copy()
 
-fp = open('test_rlt.json', 'w')
+save_dir = './save_imgs'
+if not osp.exists(save_dir):
+    os.makedirs(save_dir)
 
-faces = []
+list_fn = './list_img.txt'
+if len(sys.argv)>1:
+    list_fn = sys.argv[1]
 
-for rectangle in rectangles:
-    cv2.putText(draw,str(rectangle[4]),(int(rectangle[0]),int(rectangle[1])),cv2.FONT_HERSHEY_SIMPLEX,1,(0,255,0))
-    cv2.rectangle(draw,(int(rectangle[0]),int(rectangle[1])),(int(rectangle[2]),int(rectangle[3])),(255,0,0),1)
+with open(list_fn, 'r') as fp_list:
+    fp = open('test_rlt.json', 'w')
+    result_list = []
 
-    for i in range(5,15,2):
-    	cv2.circle(draw,(int(rectangle[i+0]),int(rectangle[i+1])),2,(0,255,0))
+    for line in fp_list:
+        imgpath = line.strip()
+        rectangles = detectFace(imgpath,threshold)
+        img = cv2.imread(imgpath)
+        draw = img.copy()
 
-    face = {
-            'rect': rectangle[0:4],
-            'score': rectangle[4],
-            '5pts': rectangle[5:15]
-            }
-    faces.append(face)
+        faces = []
 
-rlt = {'image': imgpath,
-       'faces': faces}
+        for rectangle in rectangles:
+#            cv2.putText(draw,str(rectangle[4]),(int(rectangle[0]),int(rectangle[1])),cv2.FONT_HERSHEY_SIMPLEX,1,(0,255,0))
+#            cv2.rectangle(draw,(int(rectangle[0]),int(rectangle[1])),(int(rectangle[2]),int(rectangle[3])),(255,0,0),1)
 
-json.dump(rlt, fp, indent=4)
-fp.close()
+#            for i in range(5,15,2):
+#                cv2.circle(draw,(int(rectangle[i+0]),int(rectangle[i+1])),2,(0,255,0))
 
-cv2.namedWindow("test", 0)
-cv2.imshow("test",draw)
-cv2.waitKey()
-cv2.imwrite('test.jpg',draw)
-cv2.destroyAllWindows()
+            face = {
+                    'rect': rectangle[0:4],
+                    'score': rectangle[4],
+                    '5pts': rectangle[5:15]
+                    }
+            faces.append(face)
 
+        rlt = {'image': imgpath,
+               'faces': faces}
+        result_list.append(rlt)
+
+#        base_name = osp.basename(imgpath)
+#        save_name = osp.join(save_dir, base_name)
+#        cv2.imwrite(save_name, draw)
+
+#        cv2.namedWindow("test", 1)
+#        cv2.imshow("test",draw)
+#        cv2.waitKey()
+#
+#        cv2.destroyAllWindows()
+
+    json.dump(result_list, fp, indent=4)
+    fp.close()

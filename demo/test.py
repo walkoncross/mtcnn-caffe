@@ -9,6 +9,7 @@ import numpy as np
 import json
 import os.path as osp
 
+SHOW_IMAGE = False
 
 def print_usage():
     usage = 'python %s <image-path>' % osp.basename(__file__)
